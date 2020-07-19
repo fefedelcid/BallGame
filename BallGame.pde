@@ -1,51 +1,49 @@
-Joystick joystick;
+int CELL;
+float margin;
 Player player;
+Food food;
+Button up_button, left_button, down_button, right_button;
 
 void setup() {
-  orientation(LANDSCAPE);
-  size(800, 400);
-  joystick = new Joystick();
+  orientation(PORTRAIT);
+  // size(256, 512);
+  CELL = floor(width/21);
+  margin = (width-CELL*21)/2;
   player = new Player();
+  food = new Food();
+  food.spawn();
+  create_buttons();
 }
+
 
 void draw() {
   background(51);
-  line(width/2, 0, width/2, height);
-
-  if (joystick.exist) {
-    joystick.show();
-    joystick.sendVel(player);
-  }
-
-  player.update();
+  noFill();
+  noStroke();
+  playground();
+  lines();
+  food.show();
   player.show();
+  show_buttons();
 }
 
-void mousePressed() {
-  if (mouseX <= width/2) {
-    joystick.exist = true;
-    joystick.posA = new PVector(mouseX, mouseY);
-    joystick.posB = new PVector(mouseX, mouseY);
+// BACKGROUND
+void playground() {
+  pushMatrix();
+  fill(170);
+  stroke(0, 255, 0);
+  rect(margin, margin, CELL*21, CELL*21);
+  popMatrix();
+}
+
+
+// GRID GUIDE
+void lines() {
+  pushMatrix();
+  stroke(255);
+  for (int i = 0; i<22; i++){
+    line(i*CELL + margin, margin, i*CELL + margin, width - margin);
+    line(margin, i*CELL + margin, width - margin, i*CELL + margin);
   }
-}
-
-void mouseReleased() {
-  joystick.exist = false;
-  player.vel = new PVector();
-}
-
-void mouseDragged() {
-  float d;
-  d = dist(joystick.posA.x, joystick.posA.y, mouseX, mouseY);
-
-  if (d <= joystick.r){
-    joystick.posB = new PVector(mouseX, mouseY);
-  } else {
-    float x = mouseX-joystick.posA.x;
-    float y = mouseY-joystick.posA.y;
-    PVector m = new PVector(x, y).normalize();
-    m.setMag(joystick.r);
-    m.add(joystick.posA);
-    joystick.posB = new PVector(m.x, m.y);
-  }
+  popMatrix();
 }
